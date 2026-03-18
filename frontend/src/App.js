@@ -3,12 +3,18 @@ import MapView from "./MapView";
 
 function App() {
   const [coords, setCoords] = useState(null);
-  const [roi, setRoi] = useState(null); 
+  const [roi, setRoi] = useState(null);
   const [result, setResult] = useState(null);
+
+  const [startDate1, setStartDate1] = useState("2022-01-01");
+  const [endDate1, setEndDate1] = useState("2022-03-01");
+
+  const [startDate2, setStartDate2] = useState("2023-01-01");
+  const [endDate2, setEndDate2] = useState("2023-03-01");
 
   const analyzeArea = async () => {
     if (!roi) {
-      alert("Please select an area on map");
+      alert("Select an area first");
       return;
     }
 
@@ -17,7 +23,13 @@ function App() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ roi }), 
+      body: JSON.stringify({
+        roi,
+        startDate1,
+        endDate1,
+        startDate2,
+        endDate2,
+      }),
     });
 
     const data = await res.json();
@@ -25,12 +37,30 @@ function App() {
   };
 
   return (
-    <div>
-      <h2>GaiaGuard 🌍</h2>
+    <div style={{ padding: "10px" }}>
+      <h2>🌍 GaiaGuard</h2>
 
-      <MapView setCoords={setCoords} setRoi={setRoi} />
+      <MapView
+        setCoords={setCoords}
+        setRoi={setRoi}
+        geoData={result?.geojson}
+      />
 
-      <button onClick={analyzeArea}>Analyze Area</button>
+      <h3>📅 Select Time</h3>
+
+      <div>
+        <b>Before:</b>
+        <input type="date" value={startDate1} onChange={(e) => setStartDate1(e.target.value)} />
+        <input type="date" value={endDate1} onChange={(e) => setEndDate1(e.target.value)} />
+      </div>
+
+      <div>
+        <b>After:</b>
+        <input type="date" value={startDate2} onChange={(e) => setStartDate2(e.target.value)} />
+        <input type="date" value={endDate2} onChange={(e) => setEndDate2(e.target.value)} />
+      </div>
+
+      <button onClick={analyzeArea}>🔍 Analyze Area</button>
 
       {coords && (
         <div>
@@ -41,8 +71,8 @@ function App() {
 
       {result && (
         <div>
-          <h3>Analysis Result</h3>
-          <p>Forest Loss: {result.forest_loss}%</p>
+          <h3>📊 Result</h3>
+          <p>🌳 Forest Loss: <b>{result.forest_loss}%</b></p>
           <p>Status: {result.status}</p>
         </div>
       )}
